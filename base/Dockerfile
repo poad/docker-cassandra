@@ -1,6 +1,7 @@
 ARG CASSANDRA_VERSION="3.11.5"
 ARG CASSANDRA_ESUM="d559d351309ab4b702975abffae0663ffe6378cf7402c4bcb2f9b2b2f42ac7d017d7aa05f89ee523cab72d89c79d9fbc5ef692dfbb3f56d3993acd1f34cf1285"
 ARG JAVA_VERSION="11u5-zulu-alpine"
+ARG CASSANDRA_HOME="/usr/local/cassandra"
 
 FROM alpine:3 as Downloader
 
@@ -20,15 +21,20 @@ RUN apk --update add --no-cache --virtual .build-deps \
 
 FROM mcr.microsoft.com/java/jre-headless:${JAVA_VERSION}
 
+LABEL maintainer="Kenji Saito<ken-yo@mbr.nifty.com>"
+
 ARG CASSANDRA_VERSION
+ARG CASSANDRA_HOME
 
-COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} /usr/local/cassandra
+COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
-ENV PATH=/usr/local/cassandra/bin:${PATH}
+ENV PATH=${CASSANDRA_HOME}/bin:${PATH}
 
 HEALTHCHECK CMD [ "java", "-version" ]
 
-RUN groupadd -g 1000 cassandra \
- && useradd -g 1000 -l -m -s /bin/false -u 1000 cassandra
+RUN addgroup -g 1000 -S cassandra \
+ && adduser -u 1000 -S  cassandra -G cassandra
 
 USER cassandra
+
+ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
