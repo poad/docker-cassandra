@@ -16,7 +16,10 @@ RUN apk --update add --no-cache --virtual .build-deps \
  && curl -sSLo /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz https://archive.apache.org/dist/cassandra/${CASSANDRA_VERSION}/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz \
  && sha512sum /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz \
  && echo "${CASSANDRA_ESUM}  /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz" | sha512sum -c - \
- && tar xf /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz
+ && tar xf /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz \
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/doc /tmp/apache-cassandra-${CASSANDRA_VERSION}/javadoc \
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/NOTICE.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/NEWS.txt \
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt
 
 
 FROM mcr.microsoft.com/java/jre-headless:${JAVA_VERSION}
@@ -28,7 +31,7 @@ ARG CASSANDRA_HOME
 
 COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
-ENV PATH=${CASSANDRA_HOME}/bin:${PATH}
+ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
 
 HEALTHCHECK CMD [ "java", "-version" ]
 
