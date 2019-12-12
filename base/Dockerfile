@@ -1,6 +1,6 @@
 ARG CASSANDRA_VERSION="3.11.5"
 ARG CASSANDRA_ESUM="d559d351309ab4b702975abffae0663ffe6378cf7402c4bcb2f9b2b2f42ac7d017d7aa05f89ee523cab72d89c79d9fbc5ef692dfbb3f56d3993acd1f34cf1285"
-ARG JAVA_VERSION="11u5-zulu-alpine"
+ARG JAVA_VERSION="8u232-zulu-alpine"
 ARG CASSANDRA_HOME="/usr/local/cassandra"
 
 FROM alpine:3 as Downloader
