@@ -15,7 +15,10 @@ DOCKER_CONTENT_TRUST=1
 docker build --build-arg BASE_TAG=${DOCKER_TAG} \
     --build-arg CASSANDRA_VERSION="3.11.5" \
     --build-arg CASSANDRA_ESUM="d559d351309ab4b702975abffae0663ffe6378cf7402c4bcb2f9b2b2f42ac7d017d7aa05f89ee523cab72d89c79d9fbc5ef692dfbb3f56d3993acd1f34cf1285" \
-    --build-arg JAVA_VERSION="8u232-zulu-alpine" \
+    --build-arg JAVA_SHA256SUM="8fe9b84a9ef652fdf99ebc9f30adad3be1a87b860311e453f755887bf9b6c890" \
+    --build-arg JAVA_MAJOR_VERSION="8" \
+    --build-arg JAVA_MINOR_REVISION="0.232" \
+    --build-arg ZULU_VERSION="8.42.0.23" \
     ${DOCKERFILE_PATH_ARG} -t $IMAGE_NAME .
 
 echo "------ HOOK END - BUILD -------"
