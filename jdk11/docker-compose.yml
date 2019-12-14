@@ -1,8 +1,7 @@
 version: '3.7'
 services:
   node:
-    build:
-      context: nodes
+    image: poad/docker-cassandra:3-jdk11
     container_name: cassandra
     ports:
       - 7000:7000
