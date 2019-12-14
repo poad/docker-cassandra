@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  node:
+    image: poad/docker-cassandra:3
+    container_name: cassandra
+    ports:
+      - 7000:7000
+      - 7001:7001
+      - 9042:9042
+      - 9160:9160
+    expose:
+      - 7000
+      - 7001
+      - 9042
+      - 9160
+    networks:
+      - cassandra-network
+networks:
+  cassandra-network:
+  default:
+    external:
+      name: cassandra-network

@@ -1,12 +1,10 @@
 ARG CASSANDRA_VERSION="3.11.5"
 ARG CASSANDRA_ESUM="d559d351309ab4b702975abffae0663ffe6378cf7402c4bcb2f9b2b2f42ac7d017d7aa05f89ee523cab72d89c79d9fbc5ef692dfbb3f56d3993acd1f34cf1285"
-ARG JAVA_SHA256SUM="8fe9b84a9ef652fdf99ebc9f30adad3be1a87b860311e453f755887bf9b6c890"
-ARG JAVA_MAJOR_VERSION="8"
-ARG JAVA_MINOR_REVISION="0.232"
-ARG ZULU_VERSION="8.42.0.23"
+ARG ZULU_VERSION="11.35.15"
+ARG JAVA_VERSION="11.0.5"
+ARG JAVA_SHA256SUM="fd82ffca6ee8f5a6de327ebc1bf98e326d9be2a7483ebafdc30eb126c712bd0e"
 
 ARG CASSANDRA_HOME="/usr/local/cassandra"
-ARG JAVA_VERSION="${JAVA_MAJOR_VERSION}.${JAVA_MINOR_REVISION}"
 ARG JAVA_HOME="/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64"
 
 FROM alpine:3 as Downloader
@@ -69,6 +67,12 @@ ARG CASSANDRA_HOME
 COPY --from=downloader ${JAVA_HOME} ${JAVA_HOME}
 COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
+RUN rm -f ${CASSANDRA_HOME}/conf/jvm.options \
+ && rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
+
+COPY --chown=root:root assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
+COPY --chown=root:root assets/conf/jvm.options ${CASSANDRA_HOME}/conf/jvm.options
+
 ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
 
 HEALTHCHECK CMD [ "java", "-version" ]
@@ -82,6 +86,15 @@ RUN cd ${BIN_DIR} \
 RUN addgroup -g 1000 -S cassandra \
  && adduser -u 1000 -S  cassandra -G cassandra
 
+RUN mkdir -p ${CASSANDRA_HOME}/data/ \
+ && mkdir -p ${CASSANDRA_HOME}/logs \
+ && chown -R cassandra:cassandra ${CASSANDRA_HOME}/data/ \
+ && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/
+
+EXPOSE 7000 7001 9042 9160
+
 USER cassandra
 
 ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
+
+ENTRYPOINT [ "cassandra", "-f" ]
