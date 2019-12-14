@@ -66,6 +66,9 @@ ARG MAN_DIR=/usr/share/man/man1
 ARG CASSANDRA_VERSION
 ARG CASSANDRA_HOME
 
+RUN addgroup -g 1000 -S cassandra \
+ && adduser -u 1000 -S  cassandra -G cassandra
+
 COPY --from=downloader ${JAVA_HOME} ${JAVA_HOME}
 COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
@@ -83,15 +86,12 @@ RUN cd ${BIN_DIR} \
  && cd ${MAN_DIR} \
  && find ${JAVA_HOME}/man/man1 -type f -name "*.1" -exec ln -s {} . \;
 
-RUN addgroup -g 1000 -S cassandra \
- && adduser -u 1000 -S  cassandra -G cassandra
-
-RUN mkdir -p ${CASSANDRA_HOME}/data/ \
+RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
- && chown -R cassandra:cassandra ${CASSANDRA_HOME}/data/ \
+ && chown -R cassandra:cassandra /var/lib/cassandra/ \
  && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/
 
-EXPOSE 7000 7001 9042 9160
+EXPOSE 7000 7001 7199 9042 9160
 
 USER cassandra
 

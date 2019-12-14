@@ -70,7 +70,10 @@ COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HO
 RUN rm -f ${CASSANDRA_HOME}/conf/jvm.options \
  && rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
 
-COPY --chown=root:root assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
+RUN addgroup -g 1000 -S cassandra \
+ && adduser -u 1000 -S  cassandra -G cassandra
+
+COPY --chown=cassandra:cassandra assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
 COPY --chown=root:root assets/conf/jvm.options ${CASSANDRA_HOME}/conf/jvm.options
 
 ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
@@ -83,15 +86,12 @@ RUN cd ${BIN_DIR} \
  && cd ${MAN_DIR} \
  && find ${JAVA_HOME}/man/man1 -type f -name "*.1" -exec ln -s {} . \;
 
-RUN addgroup -g 1000 -S cassandra \
- && adduser -u 1000 -S  cassandra -G cassandra
-
-RUN mkdir -p ${CASSANDRA_HOME}/data/ \
+RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
- && chown -R cassandra:cassandra ${CASSANDRA_HOME}/data/ \
+ && chown -R cassandra:cassandra /var/lib/cassandra/ \
  && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/
 
-EXPOSE 7000 7001 9042 9160
+EXPOSE 7000 7001 7199 9042 9160
 
 USER cassandra
 
