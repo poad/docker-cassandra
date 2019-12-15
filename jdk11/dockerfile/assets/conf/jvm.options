@@ -100,7 +100,6 @@
 # not necessary on Windows but doesn't harm anything.
 # see http://tech.stolsvik.com/2010/01/linux-java-thread-priorities-workar
 #-XX:ThreadPriorityPolicy=42
--XX:ThreadPriorityPolicy=1
 
 # Enable heap-dump if there's an OOM
 -XX:+HeapDumpOnOutOfMemoryError
@@ -202,7 +201,7 @@
 ### CMS Settings
 
 #-XX:+UseParNewGC
--XX:+UseConcMarkSweepGC
+#-XX:+UseConcMarkSweepGC
 -XX:+CMSParallelRemarkEnabled
 -XX:SurvivorRatio=8
 -XX:MaxTenuringThreshold=1
@@ -242,6 +241,4 @@
 # Setting both to the same value can reduce STW durations.
 #-XX:ConcGCThreads=16
 
-### GC logging options -- uncomment to enable
-
--XX:+PrintGCDetails
+-Xlog:gc:/usr/local/cassandra/logs/gc.log

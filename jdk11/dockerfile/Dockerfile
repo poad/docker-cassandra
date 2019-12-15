@@ -75,6 +75,7 @@ RUN addgroup -g 1000 -S cassandra \
 
 COPY --chown=cassandra:cassandra assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
 COPY --chown=root:root assets/conf/jvm.options ${CASSANDRA_HOME}/conf/jvm.options
+COPY --chown=cassandra:cassandra assets/docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
 
@@ -89,12 +90,15 @@ RUN cd ${BIN_DIR} \
 RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
  && chown -R cassandra:cassandra /var/lib/cassandra/ \
- && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/
+ && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/ \
+ && chmod 777 /var/lib/cassandra \
+ && chmod 774 /docker-entrypoint.sh
 
 EXPOSE 7000 7001 7199 9042 9160
 
 USER cassandra
 
 ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
+VOLUME /var/lib/cassandra
 
-ENTRYPOINT [ "cassandra", "-f" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
