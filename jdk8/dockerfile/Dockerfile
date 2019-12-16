@@ -76,6 +76,8 @@ RUN rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
 
 COPY --chown=root:root assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
 COPY --chown=cassandra:cassandra assets/docker-entrypoint.sh /docker-entrypoint.sh
+COPY --chown=cassandra:cassandra assets/requirements.txt /tmp/requirements.txt
+COPY --chown=cassandra:cassandra assets/create_keyspace.py /create_keyspace.py
 
 ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
 
@@ -92,13 +94,20 @@ RUN mkdir -p /var/lib/cassandra/ \
  && chown -R cassandra:cassandra /var/lib/cassandra/ \
  && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/ \
  && chmod 777 /var/lib/cassandra \
- && chmod 774 /docker-entrypoint.sh
+ && chmod 774 /docker-entrypoint.sh \
+ && chmod 774 /create_keyspace.py
 
 EXPOSE 7000 7001 7199 9042 9160
+
+RUN pip3 install -U pip \
+ && pip install -r /tmp/requirements.txt \
+ && rm -f /tmp/requirements.txt
 
 USER cassandra
 
 ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
+ENV PATH=/home/cassandra/.local/bin:${PATH}
+
 VOLUME /var/lib/cassandra
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
