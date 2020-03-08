@@ -13,8 +13,8 @@ fi
 DOCKER_CONTENT_TRUST=1
 
 docker build --build-arg BASE_TAG=${DOCKER_TAG} \
-    --build-arg CASSANDRA_VERSION="3.11.5" \
-    --build-arg CASSANDRA_ESUM="d559d351309ab4b702975abffae0663ffe6378cf7402c4bcb2f9b2b2f42ac7d017d7aa05f89ee523cab72d89c79d9fbc5ef692dfbb3f56d3993acd1f34cf1285" \
+    --build-arg CASSANDRA_VERSION="3.11.6" \
+    --build-arg CASSANDRA_ESUM="0e778f8fb4a050fde3ec174a9ca365e49ef437cd9e61280b6b4dcba950418a3d04a104bb41aed1add858e2acc2513cf7df4065ca5ca751dd1daf60e70adc4042" \
     --build-arg JAVA_SHA256SUM="198b5dbe6829c6fbce826dfb0fd364a531892df7d255995a3882bb7cb5b71281" \
     --build-arg JAVA_MAJOR_VERSION="8" \
     --build-arg JAVA_MINOR_REVISION="0.242" \
