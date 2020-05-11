@@ -1,0 +1,52 @@
+name: Docker image build push
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:    
+    - master
+
+jobs:
+  docker_build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [
+          'jdk8',
+          'jdk11'
+        ]
+    steps:
+    - uses: actions/checkout@master
+      if: github.event_name == 'pull_request' && github.event_name != 'schedule'
+    - name: Build ${{ matrix.dir }}
+      if: github.event_name == 'pull_request' && github.event_name != 'schedule'
+      run: |
+        CUR=$(pwd) && \
+        cd ${{ matrix.dir }}/dockerfile && \
+        docker build --rm . && \
+        cd ${CUR}
+
+  docker_push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir_tag: [
+          { dir: 'jdk8', tag: '3' },
+          { dir: 'jdk11', tag: '3-jdk11' },
+          { dir: 'jdk11', tag: 'jdk11' },
+          { dir: 'jdk8', tag: 'latest' }
+        ]
+    steps:
+    - uses: actions/checkout@master
+      if: github.event_name != 'pull_request' && github.event_name != 'schedule' && env.CHANGE_STATE != 'changed'
+    - name: Build ${{ matrix.dir_tag.tag }} and push
+      if: github.event_name != 'pull_request' && github.event_name != 'schedule' && env.CHANGE_STATE != 'changed'
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u poad --password-stdin && \
+        CUR=$(pwd) && \
+        cd ${{ matrix.dir_tag.dir }}/dockerfile && \
+        docker build --rm -t "poad/docker-cassandra:${{ matrix.dir_tag.tag }}" . && \
+        docker push "poad/web-terminal:${{ matrix.dir }}" && \
+        cd ${CUR}

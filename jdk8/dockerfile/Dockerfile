@@ -1,24 +1,12 @@
 ARG CASSANDRA_VERSION="3.11.6"
 ARG CASSANDRA_ESUM="0e778f8fb4a050fde3ec174a9ca365e49ef437cd9e61280b6b4dcba950418a3d04a104bb41aed1add858e2acc2513cf7df4065ca5ca751dd1daf60e70adc4042"
-ARG JAVA_SHA256SUM="39bee440f5a49ca0f20aa41d45db33a00963d16bb9c91d4c5a204c457ccd5d59"
-ARG JAVA_MAJOR_VERSION="8"
-ARG JAVA_MINOR_REVISION="0.252"
-ARG ZULU_VERSION="8.46.0.19"
 
 ARG CASSANDRA_HOME="/usr/local/cassandra"
-ARG JAVA_VERSION="${JAVA_MAJOR_VERSION}.${JAVA_MINOR_REVISION}"
-ARG JAVA_HOME="/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64"
 
 FROM alpine:3 as Downloader
 
 ARG CASSANDRA_VERSION
 ARG CASSANDRA_ESUM
-ARG JAVA_SHA256SUM
-ARG ZULU_VERSION
-ARG JAVA_VERSION
-ARG ZULU_ARCH="zulu${ZULU_VERSION}-ca-jre${JAVA_VERSION}-linux_musl_x64.tar.gz"
-ARG JAVA_URL="https://cdn.azul.com/zulu/bin/${ZULU_ARCH}"
-ARG JAVA_HOME
 
 WORKDIR /tmp
 
@@ -31,37 +19,25 @@ RUN apk --update add --no-cache --virtual .build-deps \
  && tar xf /tmp/apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/doc /tmp/apache-cassandra-${CASSANDRA_VERSION}/javadoc \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/NOTICE.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/NEWS.txt \
- && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt \
+ && curl -sSLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
 
-ARG TMP_FILE=/tmp/openjdk.tar.gz
-
-ENV JAVA_HOME ${JAVA_HOME}
-
-RUN echo "Download from ${JAVA_URL}" \
- && INSTALL_DIR=$( dirname ${JAVA_HOME} ) \
- && ZULU_DIR=$( basename ${ZULU_ARCH} .tar.gz ) \
- && curl -sSLo ${ZULU_ARCH} ${JAVA_URL} \
- && mkdir -p ${INSTALL_DIR} \
- && echo "${JAVA_URL}" \
- && echo "${JAVA_SHA256SUM}  ${ZULU_ARCH}" | sha256sum -c - \
- && tar -xf ./${ZULU_ARCH} -C ${INSTALL_DIR} \
- && rm -f ${ZULU_ARCH} \
- && mv ${INSTALL_DIR}/${ZULU_DIR} ${JAVA_HOME}
-
-
-FROM python:3-alpine
+FROM mcr.microsoft.com/java/jre-headless:8-zulu-alpine
 
 LABEL maintainer="Kenji Saito<ken-yo@mbr.nifty.com>"
 
-ARG JAVA_HOME
-
 ENV LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
-    JAVA_HOME=${JAVA_HOME} \
-    PATH=/root/.local/bin:${PATH}:${JAVA_HOME}/bin
+    PATH=/root/.local/bin:${PATH}
 
-ARG BIN_DIR=/usr/bin
-ARG MAN_DIR=/usr/share/man/man1
+USER root
+
+COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
+RUN apk --update add --no-cache python3 \
+ && rm -rf /var/cache/apk/* \
+ && ln -s /usr/bin/python3 /usr/bin/python \
+ && python3 /tmp/get-pip.py \
+ && rm -rf /tmp/get-pip.py
 
 ARG CASSANDRA_VERSION
 ARG CASSANDRA_HOME
@@ -69,7 +45,6 @@ ARG CASSANDRA_HOME
 RUN addgroup -g 1000 -S cassandra \
  && adduser -u 1000 -S  cassandra -G cassandra
 
-COPY --from=downloader ${JAVA_HOME} ${JAVA_HOME}
 COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
 RUN rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
@@ -83,12 +58,6 @@ ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
 
 HEALTHCHECK CMD [ "java", "-version" ]
 
-RUN cd ${BIN_DIR} \
- && find ${JAVA_HOME}/bin -type f -perm -a=x -exec ln -s {} . \; \
- && mkdir -p ${MAN_DIR} \
- && cd ${MAN_DIR} \
- && find ${JAVA_HOME}/man/man1 -type f -name "*.1" -exec ln -s {} . \;
-
 RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
  && chown -R cassandra:cassandra /var/lib/cassandra/ \
@@ -99,8 +68,7 @@ RUN mkdir -p /var/lib/cassandra/ \
 
 EXPOSE 7000 7001 7199 9042 9160
 
-RUN pip3 install -U pip \
- && pip install -r /tmp/requirements.txt \
+RUN pip install -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
 USER cassandra
