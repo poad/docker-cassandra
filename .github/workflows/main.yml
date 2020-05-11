@@ -48,5 +48,5 @@ jobs:
         CUR=$(pwd) && \
         cd ${{ matrix.dir_tag.dir }}/dockerfile && \
         docker build --rm -t "poad/docker-cassandra:${{ matrix.dir_tag.tag }}" . && \
-        docker push "poad/web-terminal:${{ matrix.dir }}" && \
+        docker push "poad/docker-cassandra:${{ matrix.dir_tag.tag }}" && \
         cd ${CUR}
