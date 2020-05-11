@@ -47,9 +47,10 @@ RUN addgroup -g 1000 -S cassandra \
 
 COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
-RUN rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
+RUN rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/jvm.options
 
 COPY --chown=root:root assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
+COPY --chown=root:root assets/conf/jvm.options ${CASSANDRA_HOME}/conf/jvm.options
 COPY --chown=cassandra:cassandra assets/docker-entrypoint.sh /docker-entrypoint.sh
 COPY --chown=cassandra:cassandra assets/requirements.txt /tmp/requirements.txt
 COPY --chown=cassandra:cassandra assets/create_keyspace.py /create_keyspace.py
