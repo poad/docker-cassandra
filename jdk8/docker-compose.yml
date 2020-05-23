@@ -1,8 +1,18 @@
-version: '3.7'
+version: '3.8'
+
 services:
-  node:
-    image: poad/docker-cassandra:3
-    container_name: cassandra
+
+  cassandra1:
+    image: poad/docker-cassandra:jdk11
+    container_name: cassandra1
+    environment:
+      - "CASSANDRA_CLUSTER_NAME=Test Cluster"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      - "CASSANDRA_DC=datacenter1"
+    ulimits:
+      memlock: -1
+      nproc: 32768
+      nofile: 100000
     ports:
       - 7000:7000
       - 7001:7001
@@ -15,6 +25,41 @@ services:
       - 9160
     networks:
       - cassandra-network
+
+  cassandra2:
+    image: poad/docker-cassandra:jdk11
+    container_name: cassandra2
+    environment:
+      - "CASSANDRA_CLUSTER_NAME=Test Cluster"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      - "CASSANDRA_DC=datacenter1"
+      - "CASSANDRA_SEEDS=cassandra1"
+    ulimits:
+      memlock: -1
+      nproc: 32768
+      nofile: 100000
+    depends_on:
+      - cassandra1
+    networks:
+      - cassandra-network
+
+  cassandra3:
+    image: poad/docker-cassandra:jdk11
+    container_name: cassandra3
+    environment:
+      - "CASSANDRA_CLUSTER_NAME=Test Cluster"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      - "CASSANDRA_DC=datacenter1"
+      - "CASSANDRA_SEEDS=cassandra1"
+    ulimits:
+      memlock: -1
+      nproc: 32768
+      nofile: 100000
+    depends_on:
+      - cassandra1
+    networks:
+      - cassandra-network
+
 networks:
   cassandra-network:
   default:
