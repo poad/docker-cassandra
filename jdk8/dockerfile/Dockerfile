@@ -20,7 +20,11 @@ RUN apk --update add --no-cache --virtual .build-deps \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/doc /tmp/apache-cassandra-${CASSANDRA_VERSION}/javadoc \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/NOTICE.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/NEWS.txt \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt \
- && curl -sSLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
+ && curl -sSLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py \
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml
+
+COPY --chown=root:root assets/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml
+
 
 FROM mcr.microsoft.com/java/jre-headless:8-zulu-alpine
 
@@ -45,11 +49,7 @@ ARG CASSANDRA_HOME
 RUN addgroup -g 1000 -S cassandra \
  && adduser -u 1000 -S  cassandra -G cassandra
 
-COPY --from=Downloader /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
-
-RUN rm -f ${CASSANDRA_HOME}/conf/cassandra.yaml
-
-COPY --chown=root:root assets/conf/cassandra.yaml ${CASSANDRA_HOME}/conf/cassandra.yaml
+COPY --from=Downloader --chown=cassandra:cassandra /tmp/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 COPY --chown=cassandra:cassandra assets/docker-entrypoint.sh /docker-entrypoint.sh
 
 ENV PATH=${CASSANDRA_HOME}/bin:${CASSANDRA_HOME}/tools/bin:${PATH}
@@ -58,13 +58,11 @@ HEALTHCHECK CMD [ "java", "-version" ]
 
 RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
- && chown -R cassandra:cassandra /var/lib/cassandra/ \
- && chown -R cassandra:cassandra ${CASSANDRA_HOME}/logs/ \
- && chmod 777 /var/lib/cassandra \
+\ && chmod 777 /var/lib/cassandra \
  && chmod 774 /docker-entrypoint.sh
 
 EXPOSE 7000 7001 7199 9042 9160
-\
+
 USER cassandra
 
 ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
