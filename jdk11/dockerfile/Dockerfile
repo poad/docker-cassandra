@@ -38,7 +38,7 @@ ENV LANGUAGE=en_US:en \
 USER root
 
 COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
-RUN apk --update add --no-cache python3 \
+RUN apk --update add --no-cache python3 bash \
  && rm -rf /var/cache/apk/* \
  && ln -s /usr/bin/python3 /usr/bin/python \
  && python3 /tmp/get-pip.py \
@@ -60,13 +60,15 @@ HEALTHCHECK CMD [ "java", "-version" ]
 RUN mkdir -p /var/lib/cassandra/ \
  && mkdir -p ${CASSANDRA_HOME}/logs \
  && chmod 777 /var/lib/cassandra \
- && chmod 774 /docker-entrypoint.sh
+ && chmod 774 /docker-entrypoint.sh \
+ && chown -R cassandra:cassandra /usr/local/cassandra/
 
 EXPOSE 7000 7001 7199 9042 9160
 
 USER cassandra
 
 ENV CASSANDRA_HOME="${CASSANDRA_HOME}"
+ENV CASSANDRA_CONF="${CASSANDRA_HOME}/conf"
 ENV PATH=/home/cassandra/.local/bin:${PATH}
 
 VOLUME /var/lib/cassandra
