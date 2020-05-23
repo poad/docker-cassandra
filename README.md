@@ -1,6 +1,6 @@
 # docker-cassandra
 
-Apache Cassandra with OpenJDK and Python 3.8. 
+Apache Cassandra with OpenJDK and Python 3.8.x based AlpineLinux
 
 ## setting up
 
@@ -8,13 +8,14 @@ Apache Cassandra with OpenJDK and Python 3.8.
 
 1. run docker container and ash on container
 
-```$bash
-docker-compose up -d
-docker exec -it cassandra sh
+```$sh
+docker-compose up -d cassandra2 cassandra3
+docker-compose exec cassandra1 cqlsh
 ```
 
 2. create keyspace name
 
-```$ash
-python3 create_keyspace.py test
+```$cqlsh
+CREATE KEYSPACE test WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+exit
 ```
