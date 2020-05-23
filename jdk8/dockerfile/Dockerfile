@@ -37,8 +37,9 @@ ENV LANGUAGE=en_US:en \
 USER root
 
 COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
-RUN apk --update add --no-cache python3 bash \
+RUN apk --update add --no-cache python2 python3 bash \
  && rm -rf /var/cache/apk/* \
+ && rm -rf /usr/bin/python \
  && ln -s /usr/bin/python3 /usr/bin/python \
  && python3 /tmp/get-pip.py \
  && rm -rf /tmp/get-pip.py
