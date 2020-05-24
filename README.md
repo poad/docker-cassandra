@@ -1,6 +1,6 @@
 # docker-cassandra
 
-Apache Cassandra with OpenJDK and Python 3.8.x based AlpineLinux
+Apache Cassandra with OpenJDK based AlpineLinux
 
 ## setting up
 

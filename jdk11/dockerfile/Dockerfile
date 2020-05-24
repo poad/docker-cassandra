@@ -21,9 +21,10 @@ RUN apk --update add --no-cache --virtual .build-deps \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/NOTICE.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/NEWS.txt \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt \
  && curl -sSLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py \
- && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/jvm.options
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/jvm.options /tmp/apache-cassandra-${CASSANDRA_VERSION}/bin/*.bat
 
 COPY --chown=root:root assets/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml
+
 COPY --chown=root:root assets/conf/jvm.options /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/jvm.options
 
 
@@ -40,8 +41,7 @@ USER root
 COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
 RUN apk --update add --no-cache python2 python3 bash \
  && rm -rf /var/cache/apk/* \
- && rm -rf /usr/bin/python \
- && ln -s /usr/bin/python3 /usr/bin/python \
+ && python /tmp/get-pip.py \
  && python3 /tmp/get-pip.py \
  && rm -rf /tmp/get-pip.py
 
