@@ -27,7 +27,11 @@ jobs:
         cd ${{ matrix.dir }}/dockerfile && \
         docker build --rm . && \
         cd ${CUR}
-
+    - name: Hadolint
+      uses: brpaz/hadolint-action@master
+      with:
+        dockerfile: ${{ matrix.dir }}/dockerfile/Dockerfile
+      
   docker_push:
     runs-on: ubuntu-latest
     strategy:
