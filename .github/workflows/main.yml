@@ -15,7 +15,9 @@ jobs:
       matrix:
         dir: [
           'cassandra3/jdk8',
-          'cassandra3/jdk11'
+          'cassandra3/jdk11',
+          'cassandra4/jdk8',
+          'cassandra4/jdk11'
         ]
     steps:
     - uses: actions/checkout@master
@@ -38,10 +40,12 @@ jobs:
     strategy:
       matrix:
         dir_tag: [
-          { dir: 'jdk8', tag: '3' },
-          { dir: 'jdk11', tag: '3-jdk11' },
-          { dir: 'jdk11', tag: 'jdk11' },
-          { dir: 'jdk8', tag: 'latest' }
+          { dir: 'cassandra3/jdk8', tag: '3' },
+          { dir: 'cassandra3/jdk11', tag: '3-jdk11' },
+          { dir: 'cassandra3/jdk11', tag: 'jdk11' },
+          { dir: 'cassandra3/jdk8', tag: 'latest' },
+          { dir: 'cassandra4/jdk8', tag: '4' },
+          { dir: 'cassandra4/jdk11', tag: '4-jdk11' }
         ]
     steps:
     - uses: actions/checkout@master
