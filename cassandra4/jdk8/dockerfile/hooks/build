@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+set -eux
+
+echo "------ HOOK START - BUILD -------"
+printenv
+
+if [ "$DOCKERFILE_PATH" = "" ]; then
+    DOCKERFILE_PATH_ARG=""
+else
+    DOCKERFILE_PATH_ARG="-f $DOCKERFILE_PATH"
+fi
+
+DOCKER_CONTENT_TRUST=1
+
+docker build --build-arg BASE_TAG=${DOCKER_TAG} \
+    --build-arg CASSANDRA_VERSION="4.0-beta4" \
+    --build-arg CASSANDRA_ESUM="af253d45681eeadc23bb7ff76091756781d021c4adea17f1d5b5cbda7fa4a0d6615ca270433827ae739516a1b23e1c2bea06ce7c0264241df21772f911fbb7d4" \
+    ${DOCKERFILE_PATH_ARG} -t $IMAGE_NAME .
+
+echo "------ HOOK END - BUILD -------"
