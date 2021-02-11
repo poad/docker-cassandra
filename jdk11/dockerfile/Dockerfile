@@ -1,5 +1,5 @@
-ARG CASSANDRA_VERSION="3.11.9"
-ARG CASSANDRA_ESUM="ada90233bcbb7bc572c24ff86a2ca2670df2955b1e451c53940faa640306c340e27933eeba013f8d4c4480e3842e5cdcd1563ac825ab4c6b036b5dbac356aa96"
+ARG CASSANDRA_VERSION="3.11.10"
+ARG CASSANDRA_ESUM="f229e2dad47ebaeb6bb7ed13ee5cea3bd3ad9994cc9222cabbffa59651e12dbf9a463e99d397a0c4096c61bacb87d34eb4fba4f8ed9da0f0972a3d7225cef36f"
 
 ARG CASSANDRA_HOME="/usr/local/cassandra"
 
@@ -41,7 +41,6 @@ USER root
 COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
 RUN apk --update add --no-cache python2 python3 bash \
  && rm -rf /var/cache/apk/* \
- && python /tmp/get-pip.py \
  && python3 /tmp/get-pip.py \
  && rm -rf /tmp/get-pip.py
 
