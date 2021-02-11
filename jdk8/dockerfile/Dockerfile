@@ -37,9 +37,9 @@ ENV LANGUAGE=en_US:en \
 USER root
 
 COPY --from=Downloader /tmp/get-pip.py /tmp/get-pip.py
-RUN apk --update add --no-cache python2 bash \
+RUN apk --update add --no-cache python2 python3 bash \
  && rm -rf /var/cache/apk/* \
- && python /tmp/get-pip.py \
+ && python3 /tmp/get-pip.py \
  && rm -rf /tmp/get-pip.py
 
 ARG CASSANDRA_VERSION
