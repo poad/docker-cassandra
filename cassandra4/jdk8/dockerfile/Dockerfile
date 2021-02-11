@@ -21,7 +21,7 @@ RUN apk --update add --no-cache --virtual .build-deps \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/NOTICE.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/NEWS.txt \
  && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/CASSANDRA-14092.txt /tmp/apache-cassandra-${CASSANDRA_VERSION}/CHANGES.txt \
  && curl -sSLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py \
- && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/bin/*.bat
+ && rm -rf /tmp/apache-cassandra-${CASSANDRA_VERSION}/bin/*.bat
 
 # COPY --chown=root:root assets/conf/cassandra.yaml /tmp/apache-cassandra-${CASSANDRA_VERSION}/conf/cassandra.yaml
 
