@@ -13,8 +13,8 @@ fi
 DOCKER_CONTENT_TRUST=1
 
 docker build --build-arg BASE_TAG=${DOCKER_TAG} \
-    --build-arg CASSANDRA_VERSION="3.11.9" \
-    --build-arg CASSANDRA_ESUM="ada90233bcbb7bc572c24ff86a2ca2670df2955b1e451c53940faa640306c340e27933eeba013f8d4c4480e3842e5cdcd1563ac825ab4c6b036b5dbac356aa96" \
+    --build-arg CASSANDRA_VERSION="3.11.10" \
+    --build-arg CASSANDRA_ESUM="f229e2dad47ebaeb6bb7ed13ee5cea3bd3ad9994cc9222cabbffa59651e12dbf9a463e99d397a0c4096c61bacb87d34eb4fba4f8ed9da0f0972a3d7225cef36f" \
     ${DOCKERFILE_PATH_ARG} -t $IMAGE_NAME .
 
 echo "------ HOOK END - BUILD -------"
