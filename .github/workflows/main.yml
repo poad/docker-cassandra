@@ -14,8 +14,8 @@ jobs:
     strategy:
       matrix:
         dir: [
-          'jdk8',
-          'jdk11'
+          'cassandra3/jdk8',
+          'cassandra3/jdk11'
         ]
     steps:
     - uses: actions/checkout@master
